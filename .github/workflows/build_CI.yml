@@ -46,6 +46,28 @@ jobs:
           cd build/bin
           ./spdm_responder_emu &
           ./spdm_device_validator_sample
+      - name: Test_RECORD_TRANSCRIPT_DATA_consistent
+        # open LIBSPDM_RECORD_TRANSCRIPT_DATA_SUPPORT flag
+        # gen spdm_requester_emu_recode_data.exe and spdm_responder_emu_recode_data.exe
+        # run to check consistent
+        run: |
+          sed -i '17a add_definitions(-DLIBSPDM_RECORD_TRANSCRIPT_DATA_SUPPORT=1)' CMakeLists.txt
+
+          sed -i '71,72d' spdm_emu/spdm_requester_emu/CMakeLists.txt
+          sed -i '70a ADD_EXECUTABLE(spdm_requester_emu_recode_data ${src_spdm_requester_emu})' spdm_emu/spdm_requester_emu/CMakeLists.txt
+          sed -i '71a TARGET_LINK_LIBRARIES(spdm_requester_emu_recode_data ${spdm_requester_emu_LIBRARY})' spdm_emu/spdm_requester_emu/CMakeLists.txt
+          sed -i '71,72d' spdm_emu/spdm_responder_emu/CMakeLists.txt
+          sed -i '70a ADD_EXECUTABLE(spdm_responder_emu_recode_data ${src_spdm_responder_emu})' spdm_emu/spdm_responder_emu/CMakeLists.txt
+          sed -i '71a TARGET_LINK_LIBRARIES(spdm_responder_emu_recode_data ${spdm_responder_emu_LIBRARY})' spdm_emu/spdm_responder_emu/CMakeLists.txt
+          cd build
+          make -j2
+
+          cd bin
+          ./spdm_responder_emu &
+          ./spdm_requester_emu_recode_data
+
+          ./spdm_responder_emu_recode_data &
+          ./spdm_requester_emu
 
   gcc_openssl_build:
     runs-on: ubuntu-latest

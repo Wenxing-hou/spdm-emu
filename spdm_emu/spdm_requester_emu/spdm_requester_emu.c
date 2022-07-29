@@ -68,7 +68,7 @@ bool init_client(SOCKET *sock, uint16_t port)
     ret_val = connect(client_socket, (struct sockaddr *)&server_addr,
                       sizeof(server_addr));
     if (ret_val == SOCKET_ERROR) {
-        printf("Connect Error - %x\n",
+        printf("Connect Error - %d\n",
 #ifdef _MSC_VER
                WSAGetLastError()
 #else
