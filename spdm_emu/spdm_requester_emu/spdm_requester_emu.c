@@ -225,6 +225,25 @@ done:
 
 int main(int argc, char *argv[])
 {
+
+    void *test_buffer;
+    size_t test_size;
+
+    test_buffer = NULL;
+    test_size = 40960;
+
+    test_buffer = malloc(test_size);
+    if (test_buffer == NULL) {
+        printf("malloc failed at the begin for responder!\n");
+        return 0;
+    }
+
+    if(! libspdm_init_scratch_memory(test_buffer, test_size)) {
+        printf("malloc failed for my malloc in responder!\n");
+        free(test_buffer);
+        return 0;
+    }
+
     printf("%s version 0.1\n", "spdm_requester_emu");
     srand((unsigned int)time(NULL));
 
@@ -234,5 +253,6 @@ int main(int argc, char *argv[])
     printf("Client stopped\n");
 
     close_pcap_packet_file();
+    free(test_buffer);
     return 0;
 }

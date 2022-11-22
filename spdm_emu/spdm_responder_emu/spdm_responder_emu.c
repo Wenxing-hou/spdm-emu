@@ -289,10 +289,28 @@ int main(int argc, char *argv[])
 {
     libspdm_return_t status;
 
+    void *test_buffer;
+    size_t test_size;
+
+    test_buffer = NULL;
+    test_size = 40960;
+
+    test_buffer = malloc(test_size);
+    if (test_buffer == NULL) {
+        printf("malloc failed at the begin for responder!\n");
+        return 0;
+    }
+
     printf("%s version 0.1\n", "spdm_responder_emu");
     srand((unsigned int)time(NULL));
 
     process_args("spdm_responder_emu", argc, argv);
+
+    if(! libspdm_init_scratch_memory(test_buffer, test_size)) {
+        printf("malloc failed for my malloc in responder!\n");
+        free(test_buffer);
+        return 0;
+    }
 
     m_spdm_context = spdm_server_init();
     if (m_spdm_context == NULL) {
@@ -317,5 +335,6 @@ int main(int argc, char *argv[])
     printf("Server stopped\n");
 
     close_pcap_packet_file();
+    free(test_buffer);
     return 0;
 }
